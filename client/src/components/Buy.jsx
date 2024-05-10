@@ -8,13 +8,13 @@ const Buy = ({ state }) => {
     const [selectedDeparture, setSelectedDeparture] = useState("");
     const [selectedDestination, setSelectedDestination] = useState("");
 
-    const { contract } = state;
+    const { ticketContract } = state;
 
     const buyTicket = async (event) => {
         event.preventDefault();
         const name = document.querySelector("#name").value;
         const amount = {value:ethers.utils.parseEther("0.02")};
-        const transaction = await contract.buyTicket(name, selectedDeparture, selectedDestination, amount);
+        const transaction = await ticketContract.buyTicket(name, selectedDeparture, selectedDestination, amount);
         await transaction.wait();
         alert("Transaction succesful");
         window.location.reload();
@@ -26,17 +26,16 @@ const Buy = ({ state }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (contract) {
-                const departures_ = await contract.getValidDepartures();
+            if (ticketContract) {
+                const departures_ = await ticketContract.getValidDepartures();
                 setDepartures(departures_);
-
-                const destinations_ = await contract.getValidDestinations();
+                const destinations_ = await ticketContract.getValidDestinations();
                 setDestinations(destinations_);
             }
         };
 
         fetchData();
-    }, [contract]);
+    }, [ticketContract]);
 
     return (
         <div className="buy-container">

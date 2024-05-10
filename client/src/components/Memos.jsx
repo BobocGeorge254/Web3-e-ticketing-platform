@@ -4,20 +4,21 @@ import "./Memos.css"
 
 const Memos = ({state}) => {
     const [memos, setMemos] = useState([]);
-    const { contract } = state;
+    const { ticketContract } = state;
 
     useEffect (() => {
         const memosMessage = async () => {
-            const memos = await contract.getMemos() ;
+            const memos = await ticketContract.getMemos() ;
             setMemos(memos);
         }
-        contract && memosMessage()
-    }, [contract])
+        ticketContract && memosMessage()
+    }, [ticketContract])
     return (
         <>
             {memos.map((memo) => {
                 return (
                     <div className="memo-container">
+                        <p className="element">{memo.ticketId.toString()}</p>
                         <p className="element">{memo.passengerName}</p>
                         <p className="element">{memo.departure}</p>
                         <p className="element">{memo.destination}</p>

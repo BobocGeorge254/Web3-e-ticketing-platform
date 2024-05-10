@@ -66,4 +66,11 @@ contract ticket {
         }
         return -1; 
     }
+
+    function transferTicket(uint _ticketId, address _to) external {
+        require(_ticketId < memos.length, "Invalid ticket ID");
+        require(memos[_ticketId].from == msg.sender, "You can only transfer your own tickets");
+        
+        memos[_ticketId].from = _to;
+    }
 }

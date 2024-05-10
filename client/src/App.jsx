@@ -2,13 +2,20 @@ import React from 'react';
 import { ethers } from "ethers"
 import './App.css'
 import { useState, useEffect } from 'react'
-import abi from "./contractJson/ticket.json"
+import ticketAbi from "./contractJson/ticket.json"
+import ticketTransferAbi from "./contractJson/TicketTransfer.json"
 import Buy from './components/Buy';
 import Memos from './components/Memos';
+import Trade from './components/Trade';
 
 
 function App() {
-  const [state2, setState2] = useState({
+  const [stateTicketsContract, setStateTicketsContract] = useState({
+    provider: null,
+    signer: null,
+    contract: null
+  })
+  const [stateTicketsTransferContract, setStateTicketsTransferContract] = useState({
     provider: null,
     signer: null,
     contract: null
@@ -18,9 +25,11 @@ function App() {
 
   useEffect(() => {
     const template = async () => {
-      const contractAddress = "0x743D5D61ECF3EEc3e28c25ec25cf1629FD8866D1";
-      const contractABI = abi.abi;
-      console.log(contractABI)
+      const contractAddress = "0xDb5998917F8df7D10f73Fd578832588bf4b961BB";
+      const contractABI = ticketAbi.abi;
+
+      const transferContractAddress = "0xEEaD0F01Ae5Efb8B91876DD586aef4Dd5539b35E";
+      const transferContractABI = ticketTransferAbi.abi;
 
       try {
         const { ethereum } = window ;
@@ -33,14 +42,18 @@ function App() {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 
-        const contract = new ethers.Contract(
+        const ticketContract = new ethers.Contract(
           contractAddress,
           contractABI,
           signer
         )
-        console.log(contract)
-        setState2({provider, signer, contract});
-        console.log("2",contract)
+        const tradeTicketContract = new ethers.Contract(
+          transferContractAddress,
+          transferContractABI,
+          signer
+        )
+        setStateTicketsContract({provider, signer, ticketContract});
+        setStateTicketsTransferContract({provider, signer, tradeTicketContract})
       }
       catch(err) {
         console.log(err);
@@ -53,8 +66,9 @@ function App() {
   return (
     <div className="App">
       Connected account : {account}
-      <Buy state={state2} />
-      <Memos state={state2} />
+      <Buy state={stateTicketsContract} />
+      <Memos state={stateTicketsContract} />
+      <Trade state={stateTicketsContract} />
     </div>
   )
 }

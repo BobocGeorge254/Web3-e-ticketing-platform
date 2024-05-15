@@ -10,7 +10,11 @@ module.exports = {
     hardhat: {},
     sepolia: {
       url: API_URL,
-      accounts: [PRIVATE_KEY]
-    }
+      accounts: [PRIVATE_KEY],
+      gas: 2100000,
+      gasPrice: 8000000000,
+    },
+    
   },
+  
 }

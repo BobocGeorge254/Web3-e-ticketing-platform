@@ -2,11 +2,20 @@ import React from 'react';
 import { ethers } from "ethers"
 import './App.css'
 import { useState, useEffect } from 'react'
-import ticketAbi from "./contractJson/ticket.json"
-import ticketTransferAbi from "./contractJson/TicketTransfer.json"
+import ticketAbi from "./contractJson/Ticket.json"
+import flightAbi from "./contractJson/Flight.json"
 import Buy from './components/Buy';
-import Memos from './components/Memos';
+import Add from './components/Add';
+import DisplayFlights from './components/DisplayFlights';
+import DisplayTicket from './components/DisplayTickets';
 import Trade from './components/Trade';
+
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+
+} from "react-router-dom";
 
 
 function App() {
@@ -15,7 +24,7 @@ function App() {
     signer: null,
     contract: null
   })
-  const [stateTicketsTransferContract, setStateTicketsTransferContract] = useState({
+  const [stateFlightsContract, setStateFlightsContract] = useState({
     provider: null,
     signer: null,
     contract: null
@@ -25,35 +34,38 @@ function App() {
 
   useEffect(() => {
     const template = async () => {
-      const contractAddress = "0xDb5998917F8df7D10f73Fd578832588bf4b961BB";
-      const contractABI = ticketAbi.abi;
+      const flightContractAddress = "0xcCcB8238fD7cf3673E21645C55296EB125Cbd25F";
+      const flightContractABI = flightAbi.abi;
 
-      const transferContractAddress = "0xEEaD0F01Ae5Efb8B91876DD586aef4Dd5539b35E";
-      const transferContractABI = ticketTransferAbi.abi;
+      const ticketContractAddress = "0x7174Bc26eb5354e3791eF1F9F2fb0144Bf5afc37";
+      const ticketContractABI = ticketAbi.abi;
 
       try {
         const { ethereum } = window ;
-        console.log(ethereum)
+
         const account = await ethereum.request({
           method: "eth_requestAccounts"
         })
 
         setAccount(account)
+        console.log(account[0])
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 
+        const flightContract = new ethers.Contract(
+          flightContractAddress,
+          flightContractABI,
+          signer
+        )
+
         const ticketContract = new ethers.Contract(
-          contractAddress,
-          contractABI,
-          signer
+          ticketContractAddress,
+          ticketContractABI,
+          signer,
         )
-        const tradeTicketContract = new ethers.Contract(
-          transferContractAddress,
-          transferContractABI,
-          signer
-        )
-        setStateTicketsContract({provider, signer, ticketContract});
-        setStateTicketsTransferContract({provider, signer, tradeTicketContract})
+        
+        setStateFlightsContract({provider, signer, flightContract});
+        setStateTicketsContract({provider, signer, ticketContract, account});
       }
       catch(err) {
         console.log(err);
@@ -66,8 +78,10 @@ function App() {
   return (
     <div className="App">
       Connected account : {account}
+      <Add state={stateFlightsContract} />
+      <DisplayFlights state={stateFlightsContract} />
       <Buy state={stateTicketsContract} />
-      <Memos state={stateTicketsContract} />
+      <DisplayTicket state={stateTicketsContract} />
       <Trade state={stateTicketsContract} />
     </div>
   )

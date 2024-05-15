@@ -1,9 +1,10 @@
-// SPDX-License-Identifier: UNLICENSED
+  // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
 import "hardhat/console.sol";
+import "./Flight.sol";
 
-contract ticket {
+contract Ticket {
     struct Memo {
         uint ticketId;
         string passengerName;
@@ -11,60 +12,41 @@ contract ticket {
         string destination;
         uint timestamp;
         address from;
+        uint flightId;
     }
+
     Memo[] public memos;
     address payable owner;
+    Flight public flightContract;
 
-    constructor () {
+    constructor (address _flightContractAddress) {
         owner = payable (msg.sender);
+        flightContract = Flight(_flightContractAddress);
     }
 
-    function buyTicket(string memory _passengerName, string memory _departure, string memory _destination) external payable {
+    function buyTicket(string memory _passengerName, uint _flightId) external payable {
         require(msg.value > 0, "Please pay more than 0");
-        require(isValidDeparture(_departure), "Invalid departure");
-        require(isValidDestination(_destination), "Invalid destination");
-        require(keccak256(bytes(_departure)) != keccak256(bytes(_destination)), "Departure and destination cannot be the same");
-
+        Flight.FlightDetails memory flight = flightContract.getFlight(_flightId);
+        require(isValidDeparture(flight.departure), "Invalid departure");
+        require(isValidDestination(flight.destination), "Invalid destination");
+        
         owner.transfer(msg.value);
         uint256 newTicketId = memos.length;
-        memos.push(Memo(newTicketId, _passengerName, _departure, _destination, block.timestamp, msg.sender));
+        memos.push(Memo(newTicketId, _passengerName, flight.departure, flight.destination, block.timestamp, msg.sender, _flightId));
+
+        flightContract.updateTicketsSold(_flightId);
     }
 
     function getMemos() public view returns (Memo[] memory) {
         return memos;
     }
 
-    function getValidDestinations() public pure returns (string[] memory) {
-        string[] memory destinations = new string[](3);
-        destinations[0] = "New York";
-        destinations[1] = "London";
-        destinations[2] = "Paris";
-        return destinations;
+    function isValidDeparture(string memory _departure) internal view returns (bool) {
+        return (flightContract.isValidDeparture(_departure));
     }
 
-    function getValidDepartures() public pure returns (string[] memory) {
-        string[] memory departures = new string[](3); 
-        departures[0] = "New York";
-        departures[1] = "London";
-        departures[2] = "Paris";
-        return departures;
-    }
-
-    function isValidDeparture(string memory _departure) internal pure returns (bool) {
-        return (_departureCompare(_departure, getValidDepartures()) >= 0);
-    }
-
-    function isValidDestination(string memory _destination) internal pure returns (bool) {
-        return (_departureCompare(_destination, getValidDestinations()) >= 0);
-    }
-
-    function _departureCompare(string memory _departureOrDestination, string[] memory validList) private pure returns (int) {
-        for (uint256 i = 0; i < validList.length; i++) {
-            if (keccak256(bytes(validList[i])) == keccak256(bytes(_departureOrDestination))) {
-                return int(i);
-            }
-        }
-        return -1; 
+    function isValidDestination(string memory _destination) internal view returns (bool) {
+        return (flightContract.isValidDestination(_destination));
     }
 
     function transferTicket(uint _ticketId, address _to) external {

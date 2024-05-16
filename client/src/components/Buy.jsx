@@ -9,13 +9,19 @@ function Buy({ state }) {
     const buyTicket = async () => {
         console.log(passengerName, flightId);
         try {
-            const { ticketContract } = state;
+            const { ticketContract, signer } = state;
+
+            const provider = signer.provider;
+            const currentGasPrice = await provider.getGasPrice();
+            const higherGasPrice = currentGasPrice.mul(120).div(100); 
+
             const tx = await ticketContract.buyTicket(passengerName, flightId, {
-                value: ethers.utils.parseEther('0.005') 
+                value: ethers.utils.parseEther('0.01'), 
+                gasPrice: higherGasPrice
             });
             await tx.wait();
             setTransactionStatus('Ticket purchased successfully!');
-            console.log("Ticket buyed succesfuly")
+            console.log("Ticket purchased successfully");
         } catch (error) {
             console.error('Error purchasing ticket:', error);
             setTransactionStatus('Error purchasing ticket. Please try again.');
@@ -45,7 +51,7 @@ function Buy({ state }) {
                     style={{ width: '80%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
                 />
             </div>
-            
+
             <div style={{ textAlign: 'center' }}>
                 <button
                     onClick={buyTicket}

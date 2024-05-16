@@ -10,10 +10,16 @@ function Add({ state }) {
 
     const addFlight = async () => {
         try {
-            const { flightContract } = state;
-            const timestamp = Date.parse(departureTime) / 1000; 
+            const { flightContract, signer } = state;
+            const timestamp = Date.parse(departureTime) / 1000;
 
-            const tx = await flightContract.addFlight(departure, destination, timestamp, duration, capacity);
+            const provider = signer.provider;
+            const currentGasPrice = await provider.getGasPrice();
+            const higherGasPrice = currentGasPrice.mul(120).div(100); 
+
+            const tx = await flightContract.addFlight(departure, destination, timestamp, duration, capacity, {
+                gasPrice: higherGasPrice
+            });
             await tx.wait();
             setTransactionStatus('Flight added successfully!');
         } catch (error) {
@@ -23,7 +29,7 @@ function Add({ state }) {
     };
 
     return (
-        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', marginBottom: '10px'}}>
+        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', marginBottom: '10px' }}>
             <h2 style={{ textAlign: 'center', color: '#333' }}>Add Flight</h2>
             <div style={{ marginBottom: '15px' }}>
                 <label htmlFor="departure" style={{ display: 'block', marginBottom: '5px', color: '#555' }}>Departure:</label>
@@ -86,7 +92,6 @@ function Add({ state }) {
             {transactionStatus && <p style={{ textAlign: 'center', marginTop: '20px', color: transactionStatus.includes('successfully') ? '#28a745' : '#dc3545' }}>{transactionStatus}</p>}
         </div>
     );
-
 }
 
 export default Add;

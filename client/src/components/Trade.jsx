@@ -7,9 +7,15 @@ function Trade({ state }) {
 
     const transferTicket = async () => {
         try {
-            const { ticketContract } = state;
+            const { ticketContract, signer } = state;
+
+            const provider = signer.provider;
+            const currentGasPrice = await provider.getGasPrice();
+            const higherGasPrice = currentGasPrice.mul(120).div(100); 
             
-            const transaction = await ticketContract.transferTicket(ticketId, transferTo);
+            const transaction = await ticketContract.transferTicket(ticketId, transferTo, {
+                gasPrice: higherGasPrice
+            });
             await transaction.wait();
             setTransactionHash(transaction.hash);
         } catch (error) {

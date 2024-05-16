@@ -4,11 +4,8 @@ import './App.css'
 import { useState, useEffect } from 'react'
 import ticketAbi from "./contractJson/Ticket.json"
 import flightAbi from "./contractJson/Flight.json"
-import Buy from './components/Buy';
-import Add from './components/Add';
-import DisplayFlights from './components/DisplayFlights';
-import DisplayTicket from './components/DisplayTickets';
-import Trade from './components/Trade';
+import Tickets from './components/Tickets';
+import Flights from './components/Flights';
 
 import {
   BrowserRouter,
@@ -78,11 +75,13 @@ function App() {
   return (
     <div className="App">
       Connected account : {account}
-      <Add state={stateFlightsContract} />
-      <DisplayFlights state={stateFlightsContract} />
-      <Buy state={stateTicketsContract} />
-      <DisplayTicket state={stateTicketsContract} />
-      <Trade state={stateTicketsContract} />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Flights state={stateFlightsContract} />} />
+          <Route path="/tickets" element={<Tickets state={stateTicketsContract} />} />
+        </Routes>
+      </BrowserRouter>
+      
     </div>
   )
 }

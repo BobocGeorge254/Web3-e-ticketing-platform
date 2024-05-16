@@ -24,6 +24,8 @@ contract Ticket {
         flightContract = Flight(_flightContractAddress);
     }
 
+    event TicketTransferred(uint ticketId, address indexed from, address indexed to);
+
     function buyTicket(string memory _passengerName, uint _flightId) external payable {
         require(msg.value > 0, "Please pay more than 0");
         Flight.FlightDetails memory flight = flightContract.getFlight(_flightId);
@@ -54,5 +56,6 @@ contract Ticket {
         require(memos[_ticketId].from == msg.sender, "You can only transfer your own tickets");
         
         memos[_ticketId].from = _to;
+        emit TicketTransferred(_ticketId, msg.sender, _to);
     }
 }

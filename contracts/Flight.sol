@@ -32,16 +32,6 @@ contract Flight {
     function getFlights() external view returns (FlightDetails[] memory) {
         return flights;
     }
-
-    function purchaseTicket(uint _flightId, string memory _passengerName) external payable {
-        require(_flightId < flights.length, "Flight does not exist");
-        FlightDetails storage flight = flights[_flightId];
-        require(flight.ticketsSold < flight.capacity, "No more tickets available");
-        
-        flight.ticketsSold++;
-        payable(admin).transfer(msg.value);
-    }
-
     function updateTicketsSold(uint _flightId) external {
         require(flights[_flightId].ticketsSold < flights[_flightId].capacity, "No more tickets available");
         flights[_flightId].ticketsSold++;

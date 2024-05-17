@@ -2,8 +2,8 @@ import React from 'react';
 import { ethers } from "ethers"
 import './App.css'
 import { useState, useEffect } from 'react'
-import ticketAbi from "./contractJson/Ticket.json"
-import flightAbi from "./contractJson/Flight.json"
+import ticketAbi from "./contracts/Ticket.json"
+import flightAbi from "./contracts/Flight.json"
 import Tickets from './components/Tickets';
 import Flights from './components/Flights';
 
@@ -77,8 +77,8 @@ function App() {
       Connected account : {account}
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Flights state={stateFlightsContract} />} />
-          <Route path="/tickets" element={<Tickets state={stateTicketsContract} />} />
+          <Route path="/flights" element={<Flights state={stateFlightsContract} />} />
+          <Route path="/" element={<Tickets state={stateTicketsContract} />} />
         </Routes>
       </BrowserRouter>
       

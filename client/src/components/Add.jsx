@@ -7,12 +7,12 @@ function Add({ state }) {
     const [duration, setDuration] = useState('');
     const [capacity, setCapacity] = useState('');
     const [transactionStatus, setTransactionStatus] = useState('');
-
+    
     const addFlight = async () => {
         try {
             const { flightContract, signer } = state;
             const timestamp = Date.parse(departureTime) / 1000;
-
+            console.log(await flightContract.admin())
             const provider = signer.provider;
             const currentGasPrice = await provider.getGasPrice();
             const higherGasPrice = currentGasPrice.mul(120).div(100); 

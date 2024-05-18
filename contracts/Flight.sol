@@ -59,4 +59,16 @@ contract Flight {
         require(msg.sender == admin, "Only admin can perform this action");
         _;
     }
+
+   function calculatePrice(uint ticketsSold, uint capacity) public pure returns (uint) {
+        uint scaleFactor = 100;
+        uint priceMultiplier = (scaleFactor + (ticketsSold * 10 * scaleFactor) / capacity);
+        return (1 * priceMultiplier);
+    }
+
+    function getPrice(uint _flightId) external view returns (uint) {
+        require(_flightId < flights.length, "Flight does not exist");
+        FlightDetails memory flight = flights[_flightId];
+        return calculatePrice(flight.ticketsSold, flight.capacity);
+    }
 }

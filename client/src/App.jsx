@@ -45,7 +45,6 @@ function App() {
         })
 
         setAccount(account)
-        console.log(account[0])
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
 

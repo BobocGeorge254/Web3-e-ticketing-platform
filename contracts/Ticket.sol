@@ -76,4 +76,5 @@ contract Ticket {
         memos[_ticketId].from = _to;
         emit TicketTransferred(_ticketId, msg.sender, _to);
     }
+
 }
